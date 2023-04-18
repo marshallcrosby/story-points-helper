@@ -1,4 +1,4 @@
-/*!
+/*
     * Blend Story Points Helper v1.0.0
     * Need description.
     *
@@ -31,8 +31,10 @@ function openSpWindow() {
     
     if (table.length === 0) {
         spWindow.document.write(spHTML);
+    } else {
+        spWindow.close();
     }
+
 }
 
-const spButton = document.querySelector('.story-points-button');
-spButton.addEventListener('click', openSpWindow);
+openSpWindow()
