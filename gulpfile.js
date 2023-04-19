@@ -140,12 +140,16 @@ gulp.task('sass', function (done) {
         .pipe(connect.reload());
 });
 
-// Runs a server to static HTML files and sets up watch tasks
-gulp.task('server', function (done) {
+const watcher = function () {
     gulp.watch((`${roots.src}/**/*.html`), gulp.series('html'));
     gulp.watch((`${roots.src}/scss/**/*.scss`), gulp.series('twig', 'sass', 'js', 'icon', 'bookmarklet', 'clean-dist'));
     gulp.watch((`${roots.src}/**/*.twig`), gulp.series('twig', 'sass', 'js', 'icon', 'bookmarklet', 'clean-dist'));
     gulp.watch((`${roots.src}/js/**/*`), gulp.series('twig', 'sass', 'js', 'icon', 'bookmarklet', 'clean-dist'));
+}
+
+// Runs a server to static HTML files and sets up watch tasks
+gulp.task('server', function (done) {
+    watcher();
 
     connect.server({
         root: roots.dist,
@@ -161,10 +165,7 @@ gulp.task('server', function (done) {
 });
 
 gulp.task('watch', function (done) {
-    gulp.watch((`${roots.src}/**/*.html`), gulp.series('html'));
-    gulp.watch((`${roots.src}/scss/**/*.scss`), gulp.series('twig', 'sass', 'js', 'icon', 'bookmarklet', 'clean-dist'));
-    gulp.watch((`${roots.src}/**/*.twig`), gulp.series('twig', 'sass', 'js', 'icon', 'bookmarklet', 'clean-dist'));
-    gulp.watch((`${roots.src}/js/**/*`), gulp.series('twig', 'sass', 'js', 'icon', 'bookmarklet', 'clean-dist'));
+    watcher();
 
     done();
 });

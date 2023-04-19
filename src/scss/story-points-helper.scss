@@ -50,6 +50,10 @@ body {
         height: 8px;
         background: var(--sp-gradient-bar);
     }
+
+    &:has(.tr:hover) .tr .td {
+        filter: grayscale(1);
+    }
 }
 
 .tr {
@@ -62,6 +66,13 @@ body {
         width: 100%;
         max-width: 100%;
     }
+
+    &:hover {
+        .td {
+            filter: grayscale(0) !important;
+            background-color: var(--sp-color-primary-200);
+        }
+    }
 }
 
 .th {
@@ -70,7 +81,7 @@ body {
 
 .th,
 .td {
-    border: 1px solid var(--sp-color-border);
+    border: 1px solid rgba(0, 0, 0, .20);
     border-top: 0;
     border-left: 0;
     border-collapse: collapse;
