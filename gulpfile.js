@@ -46,7 +46,8 @@ const replace = function (search, str) {
 // Clean task
 gulp.task('clean-dist', async function (done) {
     return del([
-        `${roots.dist}/temp`
+        `${roots.dist}/temp`,
+        `${roots.src}/images/icon.txt`
     ]);
 });
 
@@ -99,17 +100,19 @@ gulp.task('js', function (done) {
 });
 
 gulp.task('icon', function () {
-    return gulp.src(`${roots.src}/images/icon.html`)
+    require('fs').writeFileSync(`${roots.src}/images/icon.txt`, "inline('icon.png')");
+    
+    return gulp.src(`${roots.src}/images/icon.txt`)
         .pipe(base64('', {
             prefix: "",
             suffix: ""
         }))
-        .pipe(gulp.dest(`${roots.dist}/images/`));
+        .pipe(gulp.dest(`${roots.src}/images/`));
     }
 );
 
 gulp.task('bookmarklet', function (done) {
-    let icon = fs.readFileSync(`${roots.dist}/images/icon.html`, 'utf8');
+    let icon = fs.readFileSync(`${roots.src}/images/icon.txt`, 'utf8');
     let min = fs.readFileSync('dist/js/story-points-helper.min.js', 'utf8');
     let escapedJS = encodeURIComponent(min);
 
