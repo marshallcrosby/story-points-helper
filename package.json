@@ -19,6 +19,7 @@
     },
     "dependencies": {
         "autoprefixer": "^9.7.6",
+        "gulp-base64-inline": "^1.0.6",
         "gulp": "^4.0.2",
         "gulp-clean-css": "^4.3.0",
         "gulp-concat": "^2.6.1",

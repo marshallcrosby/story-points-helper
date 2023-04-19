@@ -37,7 +37,7 @@ const spHTML = /* html */`
     <body>
         ${spMarkup}
     </body>
-`
+`;
 
 function openSpWindow() {
     const spWindow = window.open('', "Blend's Story Points Helper", 'width=320,height=450');

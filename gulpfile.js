@@ -3,29 +3,32 @@
 
 const gulp = require('gulp');
 
-// HTML-related
+// HTML related
 const htmlmin = require('gulp-htmlmin');
 const twig = require('gulp-twig');
 
-// CSS-related
+// CSS related
 const sass = require('gulp-dart-sass');
 const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
 const cleanCss = require('gulp-clean-css');
 const del = require('del');
 
-// JS-related
+// JS related
 const concat = require('gulp-concat');
 const minify = require('gulp-minify');
 const include = require('gulp-include');
 
-// Utility-related
+// Utility related
 const sourcemaps = require('gulp-sourcemaps');
 const connect = require('gulp-connect');
 const open = require('gulp-open');
 const inject = require('gulp-inject-string');
 const fs = require('fs');
 const gulpReplace = require('gulp-replace');
+
+// Base 64 related
+var base64 = require('gulp-base64-inline');
 
 const localhost = 'http://localhost:8080';
 
@@ -95,15 +98,25 @@ gulp.task('js', function (done) {
         .pipe(connect.reload());
 });
 
+gulp.task('icon', function () {
+    return gulp.src(`${roots.src}/images/icon.html`)
+        .pipe(base64('', {
+            prefix: "",
+            suffix: ""
+        }))
+        .pipe(gulp.dest(`${roots.dist}/images/`));
+    }
+);
+
 gulp.task('bookmarklet', function (done) {
-    let icon = fs.readFileSync(`${roots.src}/js/story-points-icon.js`, 'utf8');
+    let icon = fs.readFileSync(`${roots.dist}/images/icon.html`, 'utf8');
     let min = fs.readFileSync('dist/js/story-points-helper.min.js', 'utf8');
     let escapedJS = encodeURIComponent(min);
 
     return gulp.src('src/bookmarklet-import.twig')
         .pipe(twig())
-        .pipe(gulpReplace('//import ${spICON}', icon.trim()))
-        .pipe(gulpReplace('//import ${spBookmarklet}', escapedJS.trim()))
+        .pipe(gulpReplace('//import${spICON}', icon))
+        .pipe(gulpReplace('//import${spBookmarklet}', escapedJS))
         .pipe(gulpReplace('%3B%0A%2F%2F%23%20sourceMappingURL%3Dstory-points-helper.min.js.map', ''))
         .pipe(gulp.dest(`./`))
 });
@@ -116,7 +129,6 @@ gulp.task('sass', function (done) {
 
     return gulp.src([`${roots.src}/scss/story-points-helper.scss`])
         .pipe(sourcemaps.init())
-        .pipe(gulp.dest(`${roots.dist}/scss`))
         .pipe(sass().on('error', sass.logError))
         .pipe(postcss(plugins))
         .pipe(cleanCss())
@@ -128,9 +140,9 @@ gulp.task('sass', function (done) {
 // Runs a server to static HTML files and sets up watch tasks
 gulp.task('server', function (done) {
     gulp.watch((`${roots.src}/**/*.html`), gulp.series('html'));
-    gulp.watch((`${roots.src}/scss/**/*.scss`), gulp.series('twig', 'sass', 'js', 'bookmarklet', 'clean-dist'));
-    gulp.watch((`${roots.src}/**/*.twig`), gulp.series('twig', 'sass', 'js', 'bookmarklet', 'clean-dist'));
-    gulp.watch((`${roots.src}/js/**/*`), gulp.series('twig', 'sass', 'js', 'bookmarklet', 'clean-dist'));
+    gulp.watch((`${roots.src}/scss/**/*.scss`), gulp.series('twig', 'sass', 'js', 'icon', 'bookmarklet', 'clean-dist'));
+    gulp.watch((`${roots.src}/**/*.twig`), gulp.series('twig', 'sass', 'js', 'icon', 'bookmarklet', 'clean-dist'));
+    gulp.watch((`${roots.src}/js/**/*`), gulp.series('twig', 'sass', 'js', 'icon', 'bookmarklet', 'clean-dist'));
 
     connect.server({
         root: roots.dist,
@@ -147,13 +159,13 @@ gulp.task('server', function (done) {
 
 gulp.task('watch', function (done) {
     gulp.watch((`${roots.src}/**/*.html`), gulp.series('html'));
-    gulp.watch((`${roots.src}/scss/**/*.scss`), gulp.series('twig', 'sass', 'js', 'bookmarklet', 'clean-dist'));
-    gulp.watch((`${roots.src}/**/*.twig`), gulp.series('twig', 'sass', 'js', 'bookmarklet', 'clean-dist'));
-    gulp.watch((`${roots.src}/js/**/*`), gulp.series('twig', 'sass', 'js', 'bookmarklet', 'clean-dist'));
+    gulp.watch((`${roots.src}/scss/**/*.scss`), gulp.series('twig', 'sass', 'js', 'icon', 'bookmarklet', 'clean-dist'));
+    gulp.watch((`${roots.src}/**/*.twig`), gulp.series('twig', 'sass', 'js', 'icon', 'bookmarklet', 'clean-dist'));
+    gulp.watch((`${roots.src}/js/**/*`), gulp.series('twig', 'sass', 'js', 'icon', 'bookmarklet', 'clean-dist'));
 
     done();
 });
 
-gulp.task('build', gulp.series('twig', 'sass', 'html', 'js', 'bookmarklet', 'clean-dist'));
+gulp.task('build', gulp.series('twig', 'sass', 'html', 'js', 'icon', 'bookmarklet', 'clean-dist'));
 
 gulp.task('default', gulp.series('build', 'server', 'clean-dist'));
